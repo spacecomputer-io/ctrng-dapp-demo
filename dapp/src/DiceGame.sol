@@ -7,6 +7,7 @@ contract DiceGame {
     uint256 public constant FEED_ID = 0;
     uint256 public totalBets;
     uint256 public winningSide;
+    uint256 public oracleValue;
     bool public resolved;
 
     struct Bet {
@@ -18,6 +19,22 @@ contract DiceGame {
     
     constructor(address _feedManager) {
         feedManager = IEOFeedManager(_feedManager);
+    }
+
+    function bet(uint256 choice) external payable {
+        bets[msg.sender] = Bet({
+            amount: msg.value,
+            choice: choice
+        });
+        totalBets += msg.value;
+    }
+
+    function resolve() external {
+        IEOFeedManager.PriceFeed memory priceFeed = feedManager.getLatestPriceFeed(FEED_ID);
+        require(priceFeed.timestamp > 0, "Oracle data not available");
+        oracleValue = priceFeed.value;
+        winningSide = (oracleValue % 6) + 1; // Convert to 1-6
+        resolved = true;
     }
 
     receive() external payable {}

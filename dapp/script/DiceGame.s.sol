@@ -12,7 +12,7 @@ contract DiceGameScript is Script {
     function run() public {
         vm.startBroadcast();
 
-        diceGame = new DiceGame();
+        diceGame = new DiceGame(address(0x5a38f4ee6e1da80b36fa94ad1d55f48a64f60572));
 
         vm.stopBroadcast();
     }
